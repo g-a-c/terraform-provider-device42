@@ -1,0 +1,7 @@
+# state files
+**/.terraform/
+**/terraform.tfstate*
+
+crash.log
+# locally built binary
+terraform-provider-device42
