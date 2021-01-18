@@ -2,8 +2,10 @@ package device42
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 
 	resty "github.com/go-resty/resty/v2"
@@ -61,6 +63,14 @@ func Provider() *schema.Provider {
 
 func configureProvider(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
 	client := resty.New()
+	if os.Getenv("D42_INSECURE") == "true" {
+		insecureTransport := &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+		client.SetTransport(insecureTransport)
+	}
 	client.SetHostURL(fmt.Sprintf("https://%s", d.Get("hostname").(string)))
 	client.SetBasicAuth(d.Get("username").(string), d.Get("password").(string))
 

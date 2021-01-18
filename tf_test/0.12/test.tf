@@ -1,9 +1,10 @@
-data "device42_password" "test" {
-  # uses one of two Sumologic syslog tokens to demo the value changing
-  # and that the values can be used to change resources, change outputs, etc
+variable "secret_id" {
+  type        = number
+  description = "ID of the secret to retrieve from Device42"
+}
 
-  # id = 18756
-  id = 18759
+data "device42_password" "test" {
+  id = var.secret_id
 }
 
 resource "null_resource" "example" {

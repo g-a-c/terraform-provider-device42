@@ -1,14 +1,19 @@
 terraform {
   required_providers {
     device42 = {
-      source  = "terraform.example.com/example/device42"
+      source  = "github.com/g-a-c/device42"
       version = "0.0.1"
     }
   }
 }
 
+variable "secret_id" {
+  type        = number
+  description = "what is the number of the secret to retrieve from Device42?"
+}
+
 data "device42_password" "test" {
-  id = 4
+  id = var.secret_id
 }
 
 resource "null_resource" "example" {
@@ -16,6 +21,11 @@ resource "null_resource" "example" {
     value = data.device42_password.test.password
   }
 }
+
+# resource "random_password" "test_pw" {
+#   length  = 8
+#   special = true
+# }
 
 output "output-password" {
   value = data.device42_password.test.password

@@ -3,5 +3,7 @@
 **/terraform.tfstate*
 
 crash.log
+.terraform.lock.hcl
+
 # locally built binary
 terraform-provider-device42
