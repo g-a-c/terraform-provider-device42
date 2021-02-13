@@ -161,5 +161,3 @@ So there's no persistent data that could be used for testing, and no way to add 
 * support a "password command" env.var (i.e. `pass test/device42` to use [passwordstore.org](https://www.passwordstore.org)) rather than a password env.var
 * try to support inserting secrets
   * this may be useful to generate a random value in Terraform using the `random` provider, then both use it as a password for a resource and also store it in Device42 in the same session
-* work out how this could be used as a custom provider since I don't want to put it in the actual Terraform registry...
-  * This may partly be addressed by pushing to an internal artifact repository and using the terraform 0.13 `required_providers` blocks

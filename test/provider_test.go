@@ -26,12 +26,6 @@ func TestDevice42_Password_ValidResponse(t *testing.T) {
 	if !reflect.DeepEqual(*processedResponse, expectedResponse) {
 		t.Fatal("value was not as expected")
 	}
-
-	// do something to add a new secret
-	// set auth header to 'Basic YXBpX3VzZXI6YXAhX3VzZXJfcHIwZA=='
-	// POST to /api/1.0/passwords with username=test, password=random_value, view_edit_users=guest,api_user
-	// read returned `id` value and use it for subsequent retrieval tests
-	// provider := device42.Provider()
 }
 
 func TestDevice42_Password_ValidResponseWithAPILimitEnforced(t *testing.T) {
@@ -52,19 +46,9 @@ func TestDevice42_Password_ValidResponseWithAPILimitEnforced(t *testing.T) {
 	if !reflect.DeepEqual(*processedResponse, expectedResponse) {
 		t.Fatal("value was not as expected")
 	}
-
-	// do something to add a new secret
-	// set auth header to 'Basic YXBpX3VzZXI6YXAhX3VzZXJfcHIwZA=='
-	// POST to /api/1.0/passwords with username=test, password=random_value, view_edit_users=guest,api_user
-	// read returned `id` value and use it for subsequent retrieval tests
-	// provider := device42.Provider()
 }
 
-func TestDevice42_Password_EmptyResponse(t *testing.T) {
-	t.Parallel()
-}
-
-// special cases:
+// special cases to test for in future:
 // {"msg": "Please enter the passphrase first. Go to Tools > Settings > Password Security", "code": 2}
 // if the password encryption secret is not configured
 //
