@@ -19,7 +19,7 @@ func Provider() *schema.Provider {
 			"hostname": &schema.Schema{
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "hostname of the Device42 service",
+				Description: "hostname of the Device42 instance",
 				DefaultFunc: func() (interface{}, error) {
 					if v := os.Getenv("D42_HOSTNAME"); v != "" {
 						return v, nil
@@ -31,7 +31,7 @@ func Provider() *schema.Provider {
 			"username": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				Description: "username with access to the Device42 service",
+				Description: "username with access to the Device42 instance",
 				DefaultFunc: func() (interface{}, error) {
 					if v := os.Getenv("D42_USERNAME"); v != "" {
 						return v, nil

@@ -88,7 +88,7 @@ func dataSourcePasswordRead(ctx context.Context, d *schema.ResourceData, m inter
 		}
 	}
 
-	// permission errors come out as a non-JSON-wrapped quoted string because why the fuck wouldn't they?
+	// permission errors come out as a non-JSON-wrapped quoted string because why not?
 	if string(passwordAPIResponse.Body()) == "\"You don't have permissions to access this resource\"" {
 		return diag.Diagnostics{
 			diag.Diagnostic{
