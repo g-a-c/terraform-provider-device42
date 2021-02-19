@@ -8,7 +8,7 @@ import (
 	"github.com/g-a-c/terraform-provider-device42/device42"
 )
 
-func TestDevice42_Password_ValidResponse(t *testing.T) {
+func TestDevice42PasswordValidResponse(t *testing.T) {
 	t.Parallel()
 	jsonResponse := `{"Passwords": [{"id": 1, "username": "validUsername", "password": "validPassword", "label": "validLabel"}]}`
 	processedResponse := new(device42.Device42PasswordList)
@@ -28,7 +28,7 @@ func TestDevice42_Password_ValidResponse(t *testing.T) {
 	}
 }
 
-func TestDevice42_Password_ValidResponseWithAPILimitEnforced(t *testing.T) {
+func TestDevice42PasswordValidResponseWithAPILimitEnforced(t *testing.T) {
 	t.Parallel()
 	jsonResponse := `{"total_count": 1, "Passwords": [{"username": "validUsername", "category": null, "device_ids": [], "view_users": "", "view_groups": "", "last_pw_change": "2020-09-08T11:35:08.808Z", "notes": "", "storage": "Normal", "use_only_users": "", "label": "validLabel", "view_edit_groups": "", "first_added": "2020-09-08T11:35:08.810Z", "use_only_groups": "", "storage_id": 1, "view_edit_users": "admin", "password": "validPassword", "id": 1, "custom_fields": []}], "limit": 1000, "offset": 0}`
 	processedResponse := new(device42.Device42PasswordList)
