@@ -1,8 +1,8 @@
 terraform {
   required_providers {
     device42 = {
-      source  = "github.com/g-a-c/device42"
-      version = "0.0.1"
+      source  = "g-a-c/device42"
+      version = "~>1.0.0"
     }
   }
 }
