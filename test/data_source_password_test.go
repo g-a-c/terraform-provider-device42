@@ -1,7 +1,6 @@
 package test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/g-a-c/terraform-provider-device42/device42"
@@ -15,10 +14,6 @@ func TestAccDevice42PasswordValidResponse(t *testing.T) {
 		IsUnitTest: false,
 		ProviderFactories: map[string]func() (*schema.Provider, error){
 			"device42": func() (*schema.Provider, error) {
-				os.Setenv("D42_HOSTNAME", "192.168.128.5:7777")
-				os.Setenv("D42_USERNAME", "tftest")
-				os.Setenv("D42_PASSWORD", "tftest")
-				os.Setenv("D42_INSECURE", "true")
 				provider := device42.Provider()
 				return provider, nil
 			},
