@@ -1,59 +1,57 @@
 package test
 
 import (
-	"encoding/json"
-	"reflect"
+	"context"
+	"os"
 	"testing"
 
 	"github.com/g-a-c/terraform-provider-device42/device42"
+	resty "github.com/go-resty/resty/v2"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/jarcoal/httpmock"
 )
 
-func TestDevice42PasswordValidResponse(t *testing.T) {
-	t.Parallel()
-	jsonResponse := `{"Passwords": [{"id": 1, "username": "validUsername", "password": "validPassword", "label": "validLabel"}]}`
-	processedResponse := new(device42.Device42PasswordList)
-	json.Unmarshal([]byte(jsonResponse), processedResponse)
-	expectedResponse := device42.Device42PasswordList{
-		Passwords: []device42.Device42Password{
-			{
-				ID:       1,
-				Username: "validUsername",
-				Password: "validPassword",
-				Label:    "validLabel",
+var providerFactories = map[string]func() (*schema.Provider, error){
+	"device42": func() (*schema.Provider, error) {
+		os.Setenv("D42_HOSTNAME", "example.com")
+		os.Setenv("D42_USERNAME", "username")
+		os.Setenv("D42_PASSWORD", "password")
+		os.Setenv("D42_INSECURE", "true")
+		provider := device42.Provider()
+		provider.Configure(context.TODO(), &terraform.ResourceConfig{
+			Config: map[string]interface{}{
+				"hostname": "example.com",
+				"username": "username",
+				"password": "password",
+				"insecure": "true",
 			},
-		},
-	}
-	if !reflect.DeepEqual(*processedResponse, expectedResponse) {
-		t.Fatal("value was not as expected")
-	}
+		})
+		// pass the httpmock client with its fake responses
+		provider.SetMeta(getMockClient())
+		httpmock.RegisterResponderWithQuery(
+			"GET",
+			"https://example.com/api/1.0/passwords/",
+			map[string]string{
+				"id":         "1",
+				"plain_text": "yes",
+			},
+			httpmock.NewStringResponder(200, `{"Passwords": [{"id": 1, "username": "validUsername", "password": "validPassword", "label": "validLabel"}]}`),
+		)
+		return provider, nil
+	},
 }
 
-func TestDevice42PasswordValidResponseWithAPILimitEnforced(t *testing.T) {
-	t.Parallel()
-	jsonResponse := `{"total_count": 1, "Passwords": [{"username": "validUsername", "category": null, "device_ids": [], "view_users": "", "view_groups": "", "last_pw_change": "2020-09-08T11:35:08.808Z", "notes": "", "storage": "Normal", "use_only_users": "", "label": "validLabel", "view_edit_groups": "", "first_added": "2020-09-08T11:35:08.810Z", "use_only_groups": "", "storage_id": 1, "view_edit_users": "admin", "password": "validPassword", "id": 1, "custom_fields": []}], "limit": 1000, "offset": 0}`
-	processedResponse := new(device42.Device42PasswordList)
-	json.Unmarshal([]byte(jsonResponse), processedResponse)
-	expectedResponse := device42.Device42PasswordList{
-		Passwords: []device42.Device42Password{
-			{
-				ID:       1,
-				Username: "validUsername",
-				Password: "validPassword",
-				Label:    "validLabel",
-			},
-		},
-	}
-	if !reflect.DeepEqual(*processedResponse, expectedResponse) {
-		t.Fatal("value was not as expected")
-	}
+func getMockClient() (client *resty.Client) {
+	client = resty.New()
+	client.SetHostURL("https://example.com")
+	client.SetBasicAuth("mockUsername", "mockPassword")
+	httpmock.ActivateNonDefault(client.GetClient())
+	return client
 }
 
-// special cases to test for in future:
-// {"msg": "Please enter the passphrase first. Go to Tools > Settings > Password Security", "code": 2}
-// if the password encryption secret is not configured
-//
-// {"msg": "", "code": 0}
-// if the password secret is configured, but there are no passwords, this happens
-//
-// {"Passwords": []}
-// if the password secret is configured, there are passwords stored, but no matches for the ID, this happens
+func TestProvider(t *testing.T) {
+	if err := device42.Provider().InternalValidate(); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+}
