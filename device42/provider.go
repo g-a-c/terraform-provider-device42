@@ -52,6 +52,18 @@ func Provider() *schema.Provider {
 					return nil, errors.New("no password was provided via the D42_PASSWORD environment variable")
 				},
 			},
+			"insecure": &schema.Schema{
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "disable TLS verification",
+				DefaultFunc: func() (interface{}, error) {
+					if v := os.Getenv("D42_INSECURE"); v == "true" {
+						return true, nil
+					}
+
+					return false, nil
+				},
+			},
 		},
 		ResourcesMap: map[string]*schema.Resource{},
 		DataSourcesMap: map[string]*schema.Resource{
@@ -61,9 +73,14 @@ func Provider() *schema.Provider {
 	}
 }
 
-func configureProvider(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+func configureProvider(ctx context.Context, d *schema.ResourceData) (m interface{}, diags diag.Diagnostics) {
 	client := resty.New()
-	if os.Getenv("D42_INSECURE") == "true" {
+	if d.Get("insecure").(bool) == true {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  "Insecure mode enabled",
+			Detail:   "TLS certificate verification was disabled for this session",
+		})
 		insecureTransport := &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
@@ -74,5 +91,5 @@ func configureProvider(ctx context.Context, d *schema.ResourceData) (interface{}
 	client.SetHostURL(fmt.Sprintf("https://%s", d.Get("hostname").(string)))
 	client.SetBasicAuth(d.Get("username").(string), d.Get("password").(string))
 
-	return client, nil
+	return client, diags
 }
