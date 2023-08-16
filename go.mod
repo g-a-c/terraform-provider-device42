@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.25.0
-	github.com/jarcoal/httpmock v1.3.0
+	github.com/jarcoal/httpmock v1.3.1
 	github.com/mitchellh/mapstructure v1.5.0
 )
 
